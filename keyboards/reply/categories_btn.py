@@ -1,10 +1,13 @@
-from aiogram.types import ReplyKeyboardRemove, \
-	ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-random_btn = KeyboardButton('Случайные фильмы')
-search_btn = KeyboardButton('Поиск')
-adv_search_btn = KeyboardButton('Поиск с фильтрами')
 
-categories_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+def create_categories_keyboard():
+	categories_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+	random_btn = KeyboardButton('Случайный фильм')
+	search_btn = KeyboardButton('Случайные фильм по жанрам')
+	categories_kb.add(random_btn, search_btn)
+	return categories_kb
 
-categories_kb.add(random_btn, search_btn, adv_search_btn)
+
+if __name__ == '__main__':
+	create_categories_keyboard()

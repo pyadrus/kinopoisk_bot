@@ -1,7 +1,9 @@
 from aiogram import executor
 from loguru import logger
 
-from handlers.custom_handlers.start import greeting_handler
+from handlers.custom_handlers.help import register_hello_replier_handler
+from handlers.custom_handlers.random import register_random_movie_command_handler
+from handlers.custom_handlers.start import register_greeting_handler
 from system.dispatcher import dp
 
 logger.add("logs/log.log", retention="1 days", enqueue=True)  # Логирование бота
@@ -14,7 +16,9 @@ def main() -> None:
     except Exception as error:
         logger.exception(error)
 
-    greeting_handler()  # Пост приветствие
+    register_greeting_handler()  # Пост приветствие, команда /start
+    register_hello_replier_handler()  # Команда /help
+    register_random_movie_command_handler()  # Рандомный фильм
 
 
 if __name__ == '__main__':

@@ -1,64 +1,140 @@
-from aiogram import types
-from config_data.config import API_KEY
 import requests
-from keyboards.inline.random_button import keyboard
-from system.dispatcher import dp
-from database.database import User, Movies
+from aiogram.dispatcher.filters import state
+
+import random
+from aiogram import types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, CallbackQuery
+from aiogram.utils.callback_data import CallbackData
+
+from system.dispatcher import dp, bot
+
+# Замените 'YOUR_API_KEY' на ваш реальный ключ API
+API_KEY = '5M8YYRN-5T3MTDZ-MES7BD1-W54W07X'
 
 
-@dp.message_handler(commands=['random'])
-async def random_movie_command(message: types.Message, *callback_user_data):
-	"""
-	Хендлер для поиска случайного фильма в базе кинопоиска
-	"""
-	try:
-		request = requests.get(f'https://api.kinopoisk.dev/v1.3/movie/random', headers={'X-API-KEY': API_KEY})
-		data = request.json()
-		poster = data['poster']['url']
-		name = data['name']
-		original_name = data['alternativeName']
-		if original_name is None:
-			original_name = ''
-		else:
-			original_name = ' / ' + str(data['alternativeName'])
-		year = data['year']
-		rating = round(data['rating']['kp'], 1)
-		genres = [genre['name'] for genre in data['genres']]
-		countries = [country['name'] for country in data['countries']]
-		description = data['description']
-		link = f'https://www.kinopoisk.ru/film/{data["id"]}'
-		movie_descr = (
-			f'{name}{original_name} ({year})\n'
-			f'Рейтинг Кинопоиск: {rating}/10⭐️\n'
-			f'Жанры: {", ".join(genres)}\n'
-			f'Страны: {", ".join(countries)}\n'
-			f'\n{description[:350] + "..."}\n'
-			f'\n{link}')
-		try:
-			if callback_user_data:
-				user_id = callback_user_data[0]
-				username = callback_user_data[1]
-			else:
-				user_id = message.from_user.id
-				username = message.from_user.username
-			try:
-				user = User.create(user_id=user_id, username=username)
-				Movies.create(user=user, link=link, movie_name=name, year=year, category='random')
-			except:
-				user = User.get(User.user_id == user_id)
-				Movies.create(user=user, link=link, movie_name=name, year=year, category='random')
-		except Exception as Ex:
-			print(Ex)
-		await message.answer_photo(poster, caption=movie_descr, reply_markup=keyboard)
-	except:
-		await message.answer('Что-то пошло не так, попробуйте снова позже')
+async def get_random_movie(chat_id, api_key):
+    url = 'https://api.kinopoisk.dev/v1.3/movie/random'
+    headers = {'X-API-KEY': api_key}
+
+    # Показываем индикатор "бот печатает" пользователю
+    await bot.send_chat_action(chat_id, 'typing')
+
+    response = requests.get(url, headers=headers, timeout=(10, 30))
+
+    if response.status_code == 200:
+        data = response.json()
+        name = data.get('name', 'Название фильма не найдено')
+        year = data.get('year', 'Год выпуска не найден')
+        rating = data.get('rating', {}).get('kp', 'Рейтинг не найден')
+        description = data.get('description', 'Описание не найдено')
+        genres = ', '.join([genre.get('name', '') for genre in data.get('genres', [])])
+        countries = ', '.join([country.get('name', '') for country in data.get('countries', [])])
+        poster_url = data.get('poster', {}).get('url', '')
+
+        movie_info = (f'Название: {name}\n'
+                      f'Год выпуска: {year}\n'
+                      f'Рейтинг Кинопоиска: {rating}\n'
+                      f'Жанры: {genres}\n'
+                      f'Страна: {countries}\n\n'
+                      f'Описание: {description}\n')
+        return movie_info, poster_url
+    else:
+        return None, None
 
 
-@dp.callback_query_handler(lambda c: c.data == 'refresh')
-async def process_callback_button(callback_query: types.CallbackQuery):
-	"""
-	Хендлер для обработки нажатия кнопки поиска другого фильма.
-	"""
-	callback_user_id = callback_query.from_user.id
-	callback_username = callback_query.from_user.username
-	await random_movie_command(callback_query.message, callback_user_id, callback_username)
+@dp.message_handler(lambda message: message.text == "Случайные фильм")
+async def random_movie_command(message: types.Message):
+    # Определите chat_id, чтобы показать индикатор "бот печатает" в нужном чате
+    chat_id = message.chat.id
+    # Показываем индикатор "бот печатает"
+    await bot.send_chat_action(chat_id, 'typing')
+    # Получаем информацию о случайном фильме
+    movie_info, poster_url = await get_random_movie(chat_id, API_KEY)
+    if movie_info:
+        if poster_url:
+            await message.answer_photo(poster_url, caption=movie_info)
+    else:
+        await message.answer("Не удалось получить данные о фильме. Попробуйте ещё раз позже.")
+
+
+def get_random_movie_genres(genres, year_range):
+    headers = {'X-API-KEY': "GJ616KK-DPC4PAH-NQVE0SS-K7Y563C"}
+    response = requests.get('https://api.kinopoisk.dev/v1.3/movie',
+                            params={"genres.name": genres, "limit": 1, "page": 1, "year": year_range},
+                            headers=headers)
+
+    if response.status_code == 200:
+        movies = response.json()
+        print(movies)
+        total_pages = movies["total"] // movies["limit"] + (1 if movies["total"] % movies["limit"] > 0 else 0)
+        random_page = random.randint(1, total_pages)
+        response = requests.get('https://api.kinopoisk.dev/v1/movie',
+                                params={"genres.name": genres, "limit": 1, "page": random_page, "year": year_range},
+                                headers=headers)
+        if response.status_code == 200:
+            movie = response.json()['docs'][0]  # Get the first movie from the response
+            name = movie.get('names', [{}])[0].get('name', 'Название фильма не найдено')
+            year = movie.get('year', 'Год выпуска не найден')
+            rating = movie['rating'].get('kp', 'Рейтинг не найден')
+            description = movie.get('description', 'Описание отсутствует')  # Handle missing 'description' key
+            genres = ', '.join([genre.get('name', '') for genre in movie.get('genres', [])])
+            countries = ', '.join([country.get('name', '') for country in movie.get('countries', [])])
+
+            poster = movie.get('poster', {})
+            poster_url = poster.get('url', '') if poster else ''  # Handle missing 'poster' key
+
+            movie_info = (f'Название: {name}\n'
+                          f'Год выпуска: {year}\n'
+                          f'Рейтинг Кинопоиска: {rating}\n'
+                          f'Жанры: {genres}\n'
+                          f'Страна: {countries}\n\n'
+                          f'Описание: {description}\n')
+            return movie_info, poster_url
+        else:
+            return None, None
+    else:
+        return None, None
+
+
+@dp.message_handler(lambda message: message.text == "Случайные фильм по жанрам")
+async def choose_genre(message: types.Message):
+    # Определите chat_id, чтобы показать индикатор "бот печатает" в нужном чате
+    chat_id = message.chat.id
+    # Показываем индикатор "бот печатает"
+    await bot.send_chat_action(chat_id, 'typing')
+    # Создайте список доступных жанров
+    genres = ["комедия", "драма", "боевик", "фантастика", "ужасы", "приключения", "триллер", "фэнтези", "детектив",
+              "криминал", "вестерн", "военный", "мелодрама"]
+    # Создайте список кнопок для клавиатуры
+    genre_buttons = [InlineKeyboardButton(text=genre, callback_data=f"genre:{genre}") for genre in genres]
+    # Создайте клавиатуру
+    genres_markup = InlineKeyboardMarkup(row_width=3)
+    genres_markup.add(*genre_buttons)
+    # Отправляем сообщение с предложением выбрать жанр
+    print(genres_markup)
+    await message.answer("Выберите жанр фильма:", reply_markup=genres_markup)
+
+
+genre_callback = CallbackData("genre", "genre")
+
+
+@dp.callback_query_handler(genre_callback.filter())
+async def process_genre_callback(query: CallbackQuery, callback_data: dict):
+    genre = callback_data["genre"]
+    chat_id = query.message.chat.id
+    year_range = "1992-2023"  # Измените годовой диапазон по вашему выбору
+    movie_info, poster_url = get_random_movie_genres(genre, year_range)
+    if movie_info:
+        # Отправляем информацию о фильме
+        if poster_url:
+            await bot.send_photo(chat_id, photo=poster_url, caption=movie_info)
+        else:
+            await bot.send_message(chat_id, movie_info, parse_mode=ParseMode.HTML)
+    else:
+        await bot.send_message(chat_id, "Извините, не удалось получить информацию о фильме.")
+
+
+def register_random_movie_command_handler():
+    """Регистрируем handlers для бота"""
+    dp.register_message_handler(random_movie_command)  # Обработчик команды /random
+    dp.register_message_handler(choose_genre)  # Обработчик команды /random
