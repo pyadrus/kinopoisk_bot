@@ -3,11 +3,11 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from callback_data.paginator import PaginatorCallback
-from config_data.config import API_KEY
-from database.database import Movies
-from database.movie_data import MovieData
-from keyboards.inline.search import search_kb
-from keyboards.inline.search_again import keyboard
+# from config_data.config import API_KEY
+# from database.database import Movies
+# from database.movie_data import MovieData
+# from keyboards.inline.search import search_kb
+# from keyboards.inline.search_again import keyboard
 from system.dispatcher import dp, bot
 from states.states import Search
 

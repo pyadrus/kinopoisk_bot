@@ -4,7 +4,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode,
 from aiogram.utils.callback_data import CallbackData
 import sqlite3
 import random
-from system.dispatcher import dp, bot
+from system.dispatcher import dp, bot, API_KEY
 
 DATABASE_FILE = 'channels.db'  # Имя файла базы данных
 
@@ -13,11 +13,9 @@ def recording_movies_in_the_database(id_movies, name, year, rating, description,
     """Запись фильмов в базу данных"""
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
-
     # Проверяем, существует ли запись с таким id_movies
     cursor.execute("SELECT * FROM movies WHERE id_movies = ?", (id_movies,))
     existing_record = cursor.fetchone()
-
     if existing_record:
         # Запись с таким id_movies уже существует, вы можете решить, что делать с дубликатом
         # Например, вы можете обновить существующую запись или игнорировать дубликат
@@ -35,7 +33,7 @@ def recording_movies_in_the_database(id_movies, name, year, rating, description,
 
 
 def get_random_movie_genres(genres, year_range):
-    headers = {'X-API-KEY': "GJ616KK-DPC4PAH-NQVE0SS-K7Y563C"}
+    headers = {'X-API-KEY': API_KEY}
     response = requests.get('https://api.kinopoisk.dev/v1.3/movie',
                             params={"genres.name": genres, "limit": 1, "page": 1, "year": year_range},
                             headers=headers)
@@ -85,7 +83,8 @@ async def choose_genre(message: types.Message):
     await bot.send_chat_action(chat_id, 'typing')
     # Создайте список доступных жанров
     genres = ["комедия", "драма", "боевик", "фантастика", "ужасы", "приключения", "триллер", "фэнтези", "детектив",
-              "криминал", "вестерн", "военный", "мелодрама"]
+              "криминал", "вестерн", "военный", "мелодрама", "мультфильм", "короткометражка", "детский", "биография",
+              "история", "аниме", "семейный"]
     # Создайте список кнопок для клавиатуры
     genre_buttons = [InlineKeyboardButton(text=genre, callback_data=f"genre:{genre}") for genre in genres]
     # Создайте клавиатуру
@@ -97,22 +96,44 @@ async def choose_genre(message: types.Message):
 
 
 genre_callback = CallbackData("genre", "genre")
+year_callback = CallbackData("year", "year")
+# Create a dictionary to store user selections
+user_selections = {}
 
 
 @dp.callback_query_handler(genre_callback.filter())
 async def process_genre_callback(query: CallbackQuery, callback_data: dict):
-    genre = callback_data["genre"]
     chat_id = query.message.chat.id
-    year_range = "1992-2023"  # Измените годовой диапазон по вашему выбору
+    genre = callback_data["genre"]
+    # Save the selected genre in the user's state
+    user_selections[chat_id] = {"genre": genre}
+    # Trigger year selection
+    await choose_year(query)
+
+
+async def choose_year(query: CallbackQuery):
+    chat_id = query.message.chat.id
+    year_ranges = ["1990-1995", "1996-2000", "2001-2005", "2006-2010", "2011-2015", "2016-2020", "2021-2023"]
+    year_markup = InlineKeyboardMarkup(row_width=3)
+
+    # Use the correct key 'year' in callback_data.new
+    year_buttons = [InlineKeyboardButton(text=year_range, callback_data=year_callback.new(year=year_range)) for year_range in year_ranges]
+    year_markup.add(*year_buttons)
+    await bot.send_message(chat_id, "Выберите диапазон лет:", reply_markup=year_markup)
+
+
+@dp.callback_query_handler(year_callback.filter())
+async def process_year_callback(query: CallbackQuery, callback_data: dict):
+    chat_id = query.message.chat.id
+    year_range = callback_data["year"]
+    genre = user_selections.get(chat_id, {}).get("genre", "Unknown")
+
+    # Use the selected genre and year range to fetch a random movie
     movie_info, poster_url = get_random_movie_genres(genre, year_range)
+
     if movie_info:
-        # Отправляем информацию о фильме
         if poster_url:
             await bot.send_photo(chat_id, photo=poster_url, caption=movie_info)
-
-
-
-
         else:
             await bot.send_message(chat_id, movie_info, parse_mode=ParseMode.HTML)
     else:
@@ -120,5 +141,6 @@ async def process_genre_callback(query: CallbackQuery, callback_data: dict):
 
 
 def register_random_genre_movie_command_handler():
-    """Регистрируем handlers для бота"""
-    dp.register_message_handler(choose_genre)  # Обработчик команды /random
+    dp.register_message_handler(choose_genre)
+    dp.register_callback_query_handler(process_genre_callback)
+    dp.register_callback_query_handler(process_year_callback)

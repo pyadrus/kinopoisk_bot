@@ -4,11 +4,7 @@ import requests
 from aiogram import types
 import aiogram.utils.exceptions
 
-from system.dispatcher import dp, bot
-
-# Замените 'YOUR_API_KEY' на ваш реальный ключ API
-# API_KEY = '5M8YYRN-5T3MTDZ-MES7BD1-W54W07X'
-API_KEY = 'GJ616KK-DPC4PAH-NQVE0SS-K7Y563C'
+from system.dispatcher import dp, bot, API_KEY
 
 DATABASE_FILE = 'channels.db'  # Имя файла базы данных
 
@@ -139,13 +135,16 @@ async def random_movie_command(message: types.Message):
                 random_id_movies = get_random_id_movies()
                 movie_info, poster_url = get_movie_info(random_id_movies)
                 await message.answer_photo(poster_url, caption=movie_info)
-
+            except aiogram.utils.exceptions.WrongFileIdentifier:
+                print("Неправильный идентификатор файла. Указан URL-адрес http...")
+                random_id_movies = get_random_id_movies()
+                movie_info, poster_url = get_movie_info(random_id_movies)
+                await message.answer_photo(poster_url, caption=movie_info)
     else:
         try:
             random_id_movies = get_random_id_movies()
             movie_info, poster_url = get_movie_info(random_id_movies)
             await message.answer_photo(poster_url, caption=movie_info)
-            # await message.answer("Не удалось получить данные о фильме. Попробуйте ещё раз позже.")
         except aiogram.utils.exceptions.BadRequest:
             print("Сообщение с подписью (caption), превышает максимальную допустимую длину")
             random_id_movies = get_random_id_movies()
