@@ -8,6 +8,7 @@ from system.dispatcher import dp, bot
 
 DATABASE_FILE = 'channels.db'  # Имя файла базы данных
 
+
 def recording_movies_in_the_database(id_movies, name, year, rating, description, genres, countries, poster_url):
     """Запись фильмов в базу данных"""
     conn = sqlite3.connect(DATABASE_FILE)
@@ -31,6 +32,7 @@ def recording_movies_in_the_database(id_movies, name, year, rating, description,
         print(f"Запись с id_movies={id_movies} успешно добавлена в базу данных.")
 
     conn.close()
+
 
 def get_random_movie_genres(genres, year_range):
     headers = {'X-API-KEY': "GJ616KK-DPC4PAH-NQVE0SS-K7Y563C"}
