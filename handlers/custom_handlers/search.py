@@ -3,33 +3,27 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from callback_data.paginator import PaginatorCallback
-# from config_data.config import API_KEY
 # from database.database import Movies
 # from database.movie_data import MovieData
 # from keyboards.inline.search import search_kb
 # from keyboards.inline.search_again import keyboard
-from system.dispatcher import dp, bot
+from system.dispatcher import dp, bot, API_KEY
 from states.states import Search
 
 
 @dp.message_handler(commands=['search'], state=None)
 async def search_movie_command(message: types.Message):
-    """
-    Хендлер реагирующий на команду /search и получающий название фильма от пользователя
-    """
+    """Хендлер реагирующий на команду /search и получающий название фильма от пользователя"""
     await bot.send_message(message.from_user.id, text="Введите название фильма для поиска: ")
     await Search.search_name.set()
 
 
 @dp.message_handler(state=Search.search_name)
 async def search_movies_list_by_name(message: types.Message, state: FSMContext):
-    """
-    Хендлер для поиска фильма по названию в базе кинопоиска
-    """
+    """Хендлер для поиска фильма по названию в базе кинопоиска"""
     try:
         movie_name = message.text
-        request = requests.get(f'https://api.kinopoisk.dev/v1.3/movie?name={movie_name}',
-                               headers={'X-API-KEY': API_KEY})
+        request = requests.get(f'https://api.kinopoisk.dev/v1.3/movie?name={movie_name}', headers={'X-API-KEY': API_KEY})
         data = request.json()
         movies_list_data = data['docs']
         await message.answer(f'Найдено результатов: {len(movies_list_data)}')

@@ -2,34 +2,10 @@ import requests
 from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, CallbackQuery
 from aiogram.utils.callback_data import CallbackData
-import sqlite3
+
 import random
+from database.database import recording_movies_in_the_database
 from system.dispatcher import dp, bot, API_KEY
-
-DATABASE_FILE = 'channels.db'  # Имя файла базы данных
-
-
-def recording_movies_in_the_database(id_movies, name, year, rating, description, genres, countries, poster_url):
-    """Запись фильмов в базу данных"""
-    conn = sqlite3.connect(DATABASE_FILE)
-    cursor = conn.cursor()
-    # Проверяем, существует ли запись с таким id_movies
-    cursor.execute("SELECT * FROM movies WHERE id_movies = ?", (id_movies,))
-    existing_record = cursor.fetchone()
-    if existing_record:
-        # Запись с таким id_movies уже существует, вы можете решить, что делать с дубликатом
-        # Например, вы можете обновить существующую запись или игнорировать дубликат
-        # В этом примере, мы игнорируем дубликат
-        print(f"Запись с id_movies={id_movies} уже существует. Игнорируем дубликат.")
-    else:
-        # Запись с id_movies не существует, выполняем вставку
-        cursor.execute("INSERT INTO movies (id_movies, name, year, rating, description, genres, countries, poster_url) "
-                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                       (id_movies, name, year, rating, description, genres, countries, poster_url))
-        conn.commit()
-        print(f"Запись с id_movies={id_movies} успешно добавлена в базу данных.")
-
-    conn.close()
 
 
 def get_random_movie_genres(genres, year_range):
@@ -37,7 +13,6 @@ def get_random_movie_genres(genres, year_range):
     response = requests.get('https://api.kinopoisk.dev/v1.3/movie',
                             params={"genres.name": genres, "limit": 1, "page": 1, "year": year_range},
                             headers=headers)
-
     if response.status_code == 200:
         movies = response.json()
         print(movies)
@@ -117,7 +92,8 @@ async def choose_year(query: CallbackQuery):
     year_markup = InlineKeyboardMarkup(row_width=3)
 
     # Use the correct key 'year' in callback_data.new
-    year_buttons = [InlineKeyboardButton(text=year_range, callback_data=year_callback.new(year=year_range)) for year_range in year_ranges]
+    year_buttons = [InlineKeyboardButton(text=year_range, callback_data=year_callback.new(year=year_range)) for
+                    year_range in year_ranges]
     year_markup.add(*year_buttons)
     await bot.send_message(chat_id, "Выберите диапазон лет:", reply_markup=year_markup)
 
@@ -127,7 +103,6 @@ async def process_year_callback(query: CallbackQuery, callback_data: dict):
     chat_id = query.message.chat.id
     year_range = callback_data["year"]
     genre = user_selections.get(chat_id, {}).get("genre", "Unknown")
-
     # Use the selected genre and year range to fetch a random movie
     movie_info, poster_url = get_random_movie_genres(genre, year_range)
 

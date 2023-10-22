@@ -29,11 +29,7 @@ class PaginatorCallback:
         self.limit = int(self.limit)
 
     def make(self, offset: int) -> PaginatorCallback:
-        return PaginatorCallback(
-            offset=offset,
-            limit=self.limit,
-            sort_order=self.sort_order
-        )
+        return PaginatorCallback(offset=offset, limit=self.limit, sort_order=self.sort_order)
 
     def next(self) -> PaginatorCallback:
         return self.make(self.offset + self.limit)
@@ -77,12 +73,7 @@ class PaginatorCallback:
         return sorted(items, key=key, reverse=self.sort_order == SortOrder.DESC)
 
     def pack(self) -> str:
-        return paginator_query.new(
-            self.offset,
-            self.limit,
-            self.sort_order,
-            self.data
-        )
+        return paginator_query.new(self.offset, self.limit, self.sort_order, self.data)
 
     def add_pagination_buttons(self, builder: InlineKeyboardMarkup, length: int):
         if length <= self.limit:
@@ -122,20 +113,9 @@ class PaginatorCallback:
         default_callback.sort_order = None
         desc_callback = self.make(self.offset)
         desc_callback.sort_order = SortOrder.DESC
-        builder.row(
-            IKButton(
-                text="🔺",
-                callback_data=asc_callback.pack()
-            ),
-            IKButton(
-                text="🌟",
-                callback_data=default_callback.pack()
-            ),
-            IKButton(
-                text="🔻",
-                callback_data=desc_callback.pack()
-            )
-        )
+        builder.row(IKButton(text="🔺", callback_data=asc_callback.pack()),
+                    IKButton(text="🌟", callback_data=default_callback.pack()),
+                    IKButton(text="🔻", callback_data=desc_callback.pack()))
 
     def get_keyboard(self, length: int = 0) -> InlineKeyboardMarkup:
         builder = InlineKeyboardMarkup()
