@@ -28,6 +28,7 @@ def recording_movies_in_the_database(id_movies, name, year, rating, description,
 
     conn.close()
 
+
 def get_random_id_movies():
     """Функция для получения случайного id_movies из базы данных"""
     conn = sqlite3.connect(DATABASE_FILE)
@@ -45,6 +46,7 @@ def get_random_id_movies():
         return random_id_movies
     else:
         return None
+
 
 def get_movie_info(id_movies):
     """Получение информации о фильме по id_movies"""
@@ -70,6 +72,27 @@ def get_movie_info(id_movies):
         return movie_info, poster_url
     else:
         return None
+
+def get_random_movie_by_genre_keyword(keyword):
+    conn = sqlite3.connect(DATABASE_FILE)
+    cursor = conn.cursor()
+    # Retrieve the IDs of movies that match the keyword in the "genres" column
+    cursor.execute("SELECT id_movies FROM movies WHERE genres LIKE ?", ('%' + keyword + '%',))
+    matching_movie_ids = cursor.fetchall()
+
+    if not matching_movie_ids:
+        conn.close()
+        return None  # No matching movies found
+
+    # Randomly select one movie ID from the list of matching movie IDs
+    random_movie_id = random.choice(matching_movie_ids)[0]
+
+    # Retrieve the movie information for the randomly selected movie
+    movie_info, poster_url = get_movie_info(random_movie_id)
+
+    conn.close()
+
+    return movie_info, poster_url
 
 if __name__ == '__main__':
     get_random_id_movies()

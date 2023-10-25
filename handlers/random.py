@@ -9,8 +9,7 @@ from system.dispatcher import dp, bot, API_KEY
 async def get_random_movie(chat_id, api_key):
     url = 'https://api.kinopoisk.dev/v1.3/movie/random'
     headers = {'X-API-KEY': api_key}
-    # Показываем индикатор "бот печатает" пользователю
-    await bot.send_chat_action(chat_id, 'typing')
+    await bot.send_chat_action(chat_id, 'typing')  # Показываем индикатор "бот печатает" пользователю
     response = requests.get(url, headers=headers, timeout=(10, 30))
     if response.status_code == 200:
         data = response.json()
@@ -41,10 +40,8 @@ async def get_random_movie(chat_id, api_key):
 async def random_movie_command(message: types.Message):
     # Определите chat_id, чтобы показать индикатор "бот печатает" в нужном чате
     chat_id = message.chat.id
-    # Показываем индикатор "бот печатает"
-    await bot.send_chat_action(chat_id, 'typing')
-    # Получаем информацию о случайном фильме
-    movie_info, poster_url = await get_random_movie(chat_id, API_KEY)
+    await bot.send_chat_action(chat_id, 'typing')  # Показываем индикатор "бот печатает"
+    movie_info, poster_url = await get_random_movie(chat_id, API_KEY)  # Получаем информацию о случайном фильме
     if movie_info:
         if poster_url:
             try:

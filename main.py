@@ -1,10 +1,11 @@
 from aiogram import executor
 from loguru import logger
 
-from handlers.custom_handlers.help import register_hello_replier_handler
-from handlers.custom_handlers.random import register_random_movie_command_handler
-from handlers.custom_handlers.random_genre import register_random_genre_movie_command_handler
-from handlers.custom_handlers.start import register_greeting_handler
+from handlers.pagination_random_genre import register_random_10_movie_command_handler_genres_1
+from handlers.pagination_top_handlers import register_random_10_movie_command_handler
+from handlers.random import register_random_movie_command_handler
+from handlers.random_genre import register_random_genre_movie_command_handler
+from handlers.start import register_greeting_handler
 from system.dispatcher import dp
 
 logger.add("logs/log.log", retention="1 days", enqueue=True)  # Логирование бота
@@ -18,9 +19,10 @@ def main() -> None:
         logger.exception(error)
 
     register_greeting_handler()  # Пост приветствие, команда /start
-    register_hello_replier_handler()  # Команда /help
     register_random_movie_command_handler()  # Рандомный фильм
     register_random_genre_movie_command_handler()  # Рандомный фильм по жанру
+    register_random_10_movie_command_handler()  # 10 случайных фильмов
+    register_random_10_movie_command_handler_genres_1()
 
 
 if __name__ == '__main__':
