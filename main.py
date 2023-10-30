@@ -3,6 +3,7 @@ from loguru import logger
 
 from handlers.pagination_random.pagination_random_country import register_random_movie_country
 from handlers.pagination_random.pagination_random_genre import register_random_10_movie_command_handler_genres_1
+from handlers.pagination_random.pagination_random_rating import register_random_movie_rating
 from handlers.pagination_random.pagination_top_handlers import register_random_10_movie_command_handler
 from handlers.random.random import register_random_movie_command_handler
 from handlers.random.random_country import register_random_country_handler
@@ -29,6 +30,7 @@ def main() -> None:
     register_random_country_handler()  # Рандомный фильм по стране происхождению
     register_random_rating_handler()  # Рандомный фильм по рейтингу
     register_random_movie_country()
+    register_random_movie_rating()
 
 
 if __name__ == '__main__':

@@ -11,10 +11,11 @@ def create_categories_keyboard():
     random_btn_10 = KeyboardButton('🎲 5 случайных фильмов')
     search_btn_genre = KeyboardButton("🎲 5 случайных фильмов по жанрам")
     top_search_btn_country = KeyboardButton('🎲 5 случайных фильмов по стране')
+    top_search_btn_ratings = KeyboardButton('🎲 5 случайных фильмов по рейтингу')
     categories_kb.add(random_btn, search_btn)
     categories_kb.add(search_btn_country, search_btn_ratings)
     categories_kb.add(random_btn_10, search_btn_genre)
-    categories_kb.add(top_search_btn_country)
+    categories_kb.add(top_search_btn_country, top_search_btn_ratings)
     return categories_kb
 
 
@@ -80,6 +81,13 @@ def create_pagination_country_keyboard():
     main_page_kb.add(home_page_btn, random_btn_10)
     return main_page_kb
 
+def create_pagination_rating_keyboard():
+    # one_time_keyboard=False - клавиатура не скрывается
+    main_page_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+    random_btn_10 = KeyboardButton('🎲 5 случайных фильмов по рейтингу')
+    home_page_btn = KeyboardButton("⬅️ На главную")
+    main_page_kb.add(home_page_btn, random_btn_10)
+    return main_page_kb
 
 if __name__ == '__main__':
     create_categories_keyboard()
