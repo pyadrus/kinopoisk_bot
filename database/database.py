@@ -52,15 +52,12 @@ def get_movie_info(id_movies):
     """Получение информации о фильме по id_movies"""
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
-
     # Выбираем запись по id_movies
     cursor.execute(
         "SELECT name, year, rating, description, genres, countries, poster_url FROM movies WHERE id_movies = ?",
         (id_movies,))
     movie_data = cursor.fetchone()
-
     conn.close()
-
     if movie_data:
         name, year, rating, description, genres, countries, poster_url = movie_data
         movie_info = (f'Название: {name}\n'
@@ -69,30 +66,46 @@ def get_movie_info(id_movies):
                       f'Жанры: {genres}\n'
                       f'Страна: {countries}\n\n'
                       f'Описание: {description}\n')
-        return movie_info, poster_url
+        # Проверяем, что poster_url не пустой (содержит данные)
+        if poster_url:
+            return movie_info, poster_url
+        else:
+            return movie_info, None  # Если poster_url пустой, возвращаем None
     else:
         return None
 
-def get_random_movie_by_genre_keyword(keyword):
+
+def get_random_movie_by_genre_and_year(keyword):
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
-    # Retrieve the IDs of movies that match the keyword in the "genres" column
-    cursor.execute("SELECT id_movies FROM movies WHERE genres LIKE ?", ('%' + keyword + '%',))
+    # Разбиваем входную строку на жанр и диапазон года
+    genre, year_range = keyword.split(',')
+    # Разбиваем диапазон года на минимальное и максимальное значение
+    min_year, max_year = map(int, year_range.split('-'))
+    # Выбираем случайный фильм с указанным жанром и годом в указанном диапазоне
+    cursor.execute("SELECT id_movies FROM movies WHERE genres LIKE ? AND year BETWEEN ? AND ?",
+                   ('%' + genre + '%', min_year, max_year))
     matching_movie_ids = cursor.fetchall()
-
     if not matching_movie_ids:
         conn.close()
-        return None  # No matching movies found
-
-    # Randomly select one movie ID from the list of matching movie IDs
+        return None  # Фильмов с указанным жанром и годом в выбранном диапазоне не найдено
+    # Случайный выбор одного из фильмов
     random_movie_id = random.choice(matching_movie_ids)[0]
-
-    # Retrieve the movie information for the randomly selected movie
+    # Получаем информацию о фильме
     movie_info, poster_url = get_movie_info(random_movie_id)
-
     conn.close()
-
     return movie_info, poster_url
+
+
+def count_rows_in_database():
+    conn = sqlite3.connect(DATABASE_FILE)
+    cursor = conn.cursor()
+    # Выполните SQL-запрос для подсчета строк в таблице
+    cursor.execute(f"SELECT COUNT(*) FROM movies")
+    count = cursor.fetchone()[0]  # Получите результат запроса
+    conn.close()  # Закройте соединение с базой данных
+    return count
+
 
 if __name__ == '__main__':
     get_random_id_movies()

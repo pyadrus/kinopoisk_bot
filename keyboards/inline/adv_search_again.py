@@ -1,7 +1,4 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.callback_data import CallbackData
-
-year_callback = CallbackData("year", "year")
 
 
 def create_genre_selection_keyboard():
@@ -17,10 +14,10 @@ def create_genre_selection_keyboard():
 
 def create_year_selection_keyboard():
     """Создайте клавиатуру с опциями выбора года"""
-    year_ranges = ["1990-1995", "1996-2000", "2001-2005", "2006-2010", "2011-2015", "2016-2020", "2021-2023"]
+    year_ranges = ["1990-2000", "2001-2005", "2006-2010", "2011-2015", "2016-2020", "2021-2024"]
+
+    year_buttons = [InlineKeyboardButton(text=year_range, callback_data=f"year:{year_range}") for year_range in year_ranges]
     year_markup = InlineKeyboardMarkup(row_width=3)
-    year_buttons = [InlineKeyboardButton(text=year_range, callback_data=year_callback.new(year=year_range)) for
-                    year_range in year_ranges]
     year_markup.add(*year_buttons)
     return year_markup
 

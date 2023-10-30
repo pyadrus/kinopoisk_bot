@@ -3,8 +3,8 @@ from loguru import logger
 
 from handlers.pagination_random_genre import register_random_10_movie_command_handler_genres_1
 from handlers.pagination_top_handlers import register_random_10_movie_command_handler
+# from handlers.pagination_top_handlers import register_random_10_movie_command_handler
 from handlers.random import register_random_movie_command_handler
-from handlers.random_genre import register_random_genre_movie_command_handler
 from handlers.start import register_greeting_handler
 from system.dispatcher import dp
 
@@ -20,7 +20,7 @@ def main() -> None:
 
     register_greeting_handler()  # Пост приветствие, команда /start
     register_random_movie_command_handler()  # Рандомный фильм
-    register_random_genre_movie_command_handler()  # Рандомный фильм по жанру
+    # register_random_genre_movie_command_handler()  # Рандомный фильм по жанру
     register_random_10_movie_command_handler()  # 10 случайных фильмов
     register_random_10_movie_command_handler_genres_1()
 

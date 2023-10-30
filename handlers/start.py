@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from database.database import count_rows_in_database
 from keyboards.reply.categories_btn import create_categories_keyboard
 from system.dispatcher import dp, bot
 
@@ -12,10 +13,28 @@ async def greeting(message: types.Message, state: FSMContext):
     await state.reset_state()  # Сбрасываем все данные машины состояний, до значения по умолчанию
     with open("media/photos/greeting.jpg", "rb") as photo_file:  # Загружаем фото для поста
         categories_kb = create_categories_keyboard()
+        count = count_rows_in_database()
         post_greeting = ('Привет! 👋🎥 Я твой личный кинобот.\n\n'
                          'Я помогу тебе найти лучшие фильмы, расскажу об актерах, подскажу рейтинги и многое другое.\n\n'
-                         'Просто спрашивай, и я помогу найти идеальный фильм для твоего настроения! 😊🍿🎬')
+                         'Просто спрашивай, и я помогу найти идеальный фильм для твоего настроения! 😊🍿🎬'
+                         f'Бот имеет обширную базу в {count} фильмов 🎥')
         await bot.send_photo(message.from_user.id, caption=post_greeting, photo=photo_file, reply_markup=categories_kb)
+
+
+@dp.message_handler(lambda message: message.text == "⬅️ На главную")
+async def greeting_home(message: types.Message, state: FSMContext):
+    """Главная страница бота"""
+    await state.finish()
+    await state.reset_state()
+    with open("media/photos/greeting.jpg", "rb") as photo_file:  # Загружаем фото для поста
+        categories_kb = create_categories_keyboard()
+        count = count_rows_in_database()
+        post_greeting = ('Привет! 👋🎥 Я твой личный кинобот.\n\n'
+                         'Я помогу тебе найти лучшие фильмы, расскажу об актерах, подскажу рейтинги и многое другое.\n\n'
+                         f'Просто спрашивай, и я помогу найти идеальный фильм для твоего настроения! 😊🍿🎬\n\n'
+                         f'Бот имеет обширную базу в {count} фильмов 🎥')
+        await bot.send_photo(message.from_user.id, caption=post_greeting, photo=photo_file, reply_markup=categories_kb)
+
 
 
 @dp.callback_query_handler(lambda c: c.data == "disagree")

@@ -36,23 +36,35 @@ async def get_random_movie(chat_id, api_key):
         return None, None
 
 
-@dp.message_handler(lambda message: message.text == "Случайный фильм")
+@dp.message_handler(lambda message: message.text == "🎬 Случайный фильм")
 async def random_movie_command(message: types.Message):
     # Определите chat_id, чтобы показать индикатор "бот печатает" в нужном чате
     chat_id = message.chat.id
     await bot.send_chat_action(chat_id, 'typing')  # Показываем индикатор "бот печатает"
-    movie_info, poster_url = await get_random_movie(chat_id, API_KEY)  # Получаем информацию о случайном фильме
-    if movie_info:
-        if poster_url:
+    for i in range(200):
+
+        movie_info, poster_url = await get_random_movie(chat_id, API_KEY)  # Получаем информацию о случайном фильме
+        if movie_info:
+            if poster_url:
+                try:
+                    await message.answer_photo(poster_url, caption=movie_info)
+                except aiogram.utils.exceptions.InvalidHTTPUrlContent:
+                    print("Ошибка получения содержимого HTTP-URL")
+                    random_id_movies = get_random_id_movies()
+                    movie_info, poster_url = get_movie_info(random_id_movies)
+                    await message.answer_photo(poster_url, caption=movie_info)
+                except aiogram.utils.exceptions.WrongFileIdentifier:
+                    print("Неправильный идентификатор файла. Указан URL-адрес http...")
+                    random_id_movies = get_random_id_movies()
+                    movie_info, poster_url = get_movie_info(random_id_movies)
+                    await message.answer_photo(poster_url, caption=movie_info)
+                except aiogram.utils.exceptions.BadRequest:
+                    print("Сообщение с подписью (caption), превышает максимальную допустимую длину")
+                    random_id_movies = get_random_id_movies()
+                    movie_info, poster_url = get_movie_info(random_id_movies)
+                    await message.answer_photo(poster_url, caption=movie_info)
+        else:
             try:
-                await message.answer_photo(poster_url, caption=movie_info)
-            except aiogram.utils.exceptions.InvalidHTTPUrlContent:
-                print("Ошибка получения содержимого HTTP-URL")
-                random_id_movies = get_random_id_movies()
-                movie_info, poster_url = get_movie_info(random_id_movies)
-                await message.answer_photo(poster_url, caption=movie_info)
-            except aiogram.utils.exceptions.WrongFileIdentifier:
-                print("Неправильный идентификатор файла. Указан URL-адрес http...")
                 random_id_movies = get_random_id_movies()
                 movie_info, poster_url = get_movie_info(random_id_movies)
                 await message.answer_photo(poster_url, caption=movie_info)
@@ -61,16 +73,6 @@ async def random_movie_command(message: types.Message):
                 random_id_movies = get_random_id_movies()
                 movie_info, poster_url = get_movie_info(random_id_movies)
                 await message.answer_photo(poster_url, caption=movie_info)
-    else:
-        try:
-            random_id_movies = get_random_id_movies()
-            movie_info, poster_url = get_movie_info(random_id_movies)
-            await message.answer_photo(poster_url, caption=movie_info)
-        except aiogram.utils.exceptions.BadRequest:
-            print("Сообщение с подписью (caption), превышает максимальную допустимую длину")
-            random_id_movies = get_random_id_movies()
-            movie_info, poster_url = get_movie_info(random_id_movies)
-            await message.answer_photo(poster_url, caption=movie_info)
 
 
 def register_random_movie_command_handler():
