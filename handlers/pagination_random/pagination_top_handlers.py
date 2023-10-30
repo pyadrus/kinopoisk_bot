@@ -5,6 +5,7 @@ from aiogram.types.input_media import InputMediaPhoto
 from aiogram.utils.callback_data import CallbackData
 
 from database.database import get_random_id_movies, get_movie_info
+from keyboards.reply.categories_btn import create_pagination_top_handlers_keyboard
 from system.dispatcher import dp, bot
 
 items = {}
@@ -12,8 +13,9 @@ items = {}
 
 @dp.message_handler(lambda message: message.text == "🎲 5 случайных фильмов")
 async def random_movie_command(message: types.Message):
-    await message.answer("Вот 5 случайных фильмов:")
     chat_id = message.chat.id
+    main_page_kb = create_pagination_top_handlers_keyboard()
+    await bot.send_message(chat_id, "🎲 5 случайных фильмов", reply_markup=main_page_kb)
     await bot.send_chat_action(chat_id, 'typing')  # Показываем индикатор "бот печатает"
     for i in range(5):
         random_id_movies = get_random_id_movies()

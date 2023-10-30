@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
 from database.database import get_random_movie_by_genre_and_year
+from keyboards.reply.categories_btn import create_random_genre_keyboard
 from system.dispatcher import dp, bot
 
 
@@ -31,6 +32,9 @@ def create_year_random_movie_by_genre_keyboard():
 
 @dp.message_handler(lambda message: message.text == "🎬 Случайный фильм по жанру")
 async def random_movie_by_genre(message: types.Message):
+    chat_id = message.chat.id
+    main_page_kb = create_random_genre_keyboard()
+    await bot.send_message(chat_id, "🎬 Случайный фильм по жанру", reply_markup=main_page_kb)
     genres_markup = create_genre_random_movie_by_genre_keyboard()  # Клавиатура выбора жанра фильма
     await message.answer("Выберите жанр фильма:", reply_markup=genres_markup)
 

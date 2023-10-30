@@ -7,6 +7,7 @@ from aiogram.utils.callback_data import CallbackData
 
 from database.database import get_random_movie_by_genre_and_year
 from keyboards.inline.adv_search_again import create_genre_selection_keyboard, create_year_selection_keyboard
+from keyboards.reply.categories_btn import create_pagination_random_genre_keyboard
 from system.dispatcher import dp, bot
 
 user_selections = {}  # Create a dictionary to store user selections
@@ -18,7 +19,9 @@ genre_callback = CallbackData("genre", "genre")
 
 @dp.message_handler(lambda message: message.text == "🎲 5 случайных фильмов по жанрам")
 async def random_movie_command_genres_1(message: types.Message):
-    # with open("media/photos/greeting.jpg", "rb") as photo_file:  # Загружаем фото для поста
+    chat_id = message.chat.id
+    main_page_kb = create_pagination_random_genre_keyboard()
+    await bot.send_message(chat_id, "🎲 5 случайных фильмов по жанрам", reply_markup=main_page_kb)
     genres_markup = create_genre_selection_keyboard()  # Клавиатура выбора жанра фильма
     await message.answer("Выберите жанр фильма:", reply_markup=genres_markup)
 

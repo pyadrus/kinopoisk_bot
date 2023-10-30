@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
 from database.database import get_random_movie_by_country
+from keyboards.reply.categories_btn import create_random_country_keyboard
 from system.dispatcher import dp, bot
 
 
@@ -22,6 +23,9 @@ def create_genre_random_movie_by_country_keyboard():
 
 @dp.message_handler(lambda message: message.text == "🎬 Случайный фильм по стране")
 async def random_movie_by_country(message: types.Message):
+    chat_id = message.chat.id
+    main_page_kb = create_random_country_keyboard()
+    await bot.send_message(chat_id, "🎬 Случайный фильм по стране", reply_markup=main_page_kb)
     country_markup = create_genre_random_movie_by_country_keyboard()  # Клавиатура выбора жанра фильма
     await message.answer("Выберите страну происхождения фильма:", reply_markup=country_markup)
 

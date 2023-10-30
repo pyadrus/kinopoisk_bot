@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
 
 from database.database import get_random_movie_by_ratings
+from keyboards.reply.categories_btn import create_random_rating_keyboard
 from system.dispatcher import dp, bot
 
 
@@ -19,6 +20,9 @@ def create_rating_random_movie_by_rating_keyboard():
 
 @dp.message_handler(lambda message: message.text == "🎬 Случайный фильм по рейтингу")
 async def random_movie_by_rating(message: types.Message):
+    chat_id = message.chat.id
+    main_page_kb = create_random_rating_keyboard()
+    await bot.send_message(chat_id, "🎬 Случайный фильм по рейтингу", reply_markup=main_page_kb)
     rating_markup = create_rating_random_movie_by_rating_keyboard()  # Клавиатура выбора жанра фильма
     await message.answer("Выберите рейтинг для фильма:", reply_markup=rating_markup)
 

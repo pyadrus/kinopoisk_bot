@@ -1,12 +1,13 @@
 from aiogram import executor
 from loguru import logger
 
-from handlers.pagination_random_genre import register_random_10_movie_command_handler_genres_1
-from handlers.pagination_top_handlers import register_random_10_movie_command_handler
-from handlers.random import register_random_movie_command_handler
-from handlers.random_country import register_random_country_handler
-from handlers.random_genre import register_random_movie_by_genre_handler
-from handlers.random_rating import register_random_rating_handler
+from handlers.pagination_random.pagination_random_country import register_random_movie_country
+from handlers.pagination_random.pagination_random_genre import register_random_10_movie_command_handler_genres_1
+from handlers.pagination_random.pagination_top_handlers import register_random_10_movie_command_handler
+from handlers.random.random import register_random_movie_command_handler
+from handlers.random.random_country import register_random_country_handler
+from handlers.random.random_genre import register_random_movie_by_genre_handler
+from handlers.random.random_rating import register_random_rating_handler
 from handlers.start import register_greeting_handler
 from system.dispatcher import dp
 
@@ -27,6 +28,7 @@ def main() -> None:
     register_random_movie_by_genre_handler()
     register_random_country_handler()  # Рандомный фильм по стране происхождению
     register_random_rating_handler()  # Рандомный фильм по рейтингу
+    register_random_movie_country()
 
 
 if __name__ == '__main__':
