@@ -33,13 +33,10 @@ def get_random_id_movies():
     """Функция для получения случайного id_movies из базы данных"""
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
-
     # Выбираем все существующие id_movies
     cursor.execute("SELECT id_movies FROM movies")
     id_movies_list = cursor.fetchall()
-
     conn.close()
-
     # Если есть хотя бы один id_movies, выбираем случайный из них
     if id_movies_list:
         random_id_movies = random.choice(id_movies_list)[0]

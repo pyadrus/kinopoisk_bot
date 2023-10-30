@@ -41,7 +41,7 @@ async def random_movie_command(message: types.Message):
     # Определите chat_id, чтобы показать индикатор "бот печатает" в нужном чате
     chat_id = message.chat.id
     await bot.send_chat_action(chat_id, 'typing')  # Показываем индикатор "бот печатает"
-    for i in range(200):
+    for i in range(1):
 
         movie_info, poster_url = await get_random_movie(chat_id, API_KEY)  # Получаем информацию о случайном фильме
         if movie_info:

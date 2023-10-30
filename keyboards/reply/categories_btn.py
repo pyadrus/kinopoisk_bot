@@ -5,7 +5,7 @@ def create_categories_keyboard():
 	# one_time_keyboard=False - клавиатура не скрывается
 	categories_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
 	random_btn = KeyboardButton('🎬 Случайный фильм')
-	search_btn = KeyboardButton('🎬 Случайные фильмы по жанрам')
+	search_btn = KeyboardButton('🎬 Случайный фильм по жанру')
 	random_btn_10 = KeyboardButton('🎲 5 случайных фильмов')
 	search_btn_genre = KeyboardButton("🎲 5 случайных фильмов по жанрам")
 	home_page_btn = KeyboardButton("⬅️ На главную")
