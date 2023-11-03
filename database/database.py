@@ -102,6 +102,7 @@ def get_random_movie_by_country(keyword):
         return None  # Фильмов с указанной страной не найдено
     # Случайный выбор одного из фильмов
     random_movie_id = random.choice(matching_movie_ids)[0]
+    print(random_movie_id)
     # Получаем информацию о фильме
     movie_info, poster_url = get_movie_info(random_movie_id)
     return movie_info, poster_url
@@ -124,6 +125,29 @@ def get_random_movie_by_genre_and_year(keyword):
     # Случайный выбор одного из фильмов
     random_movie_id = random.choice(matching_movie_ids)[0]
     # Получаем информацию о фильме
+    movie_info, poster_url = get_movie_info(random_movie_id)
+    conn.close()
+    return movie_info, poster_url
+
+
+def get_random_movie_by_genre_year_rating_country(keyword):
+    conn = sqlite3.connect(DATABASE_FILE)
+    cursor = conn.cursor()
+    print(keyword)
+    genre,year_range, country,  top_rating = keyword.split(',')
+    print(genre, country, year_range, top_rating)
+    min_year, max_year = map(int, year_range.split('-'))
+    print(min_year, max_year)
+    min_rating, max_rating = map(float, top_rating.split('-'))
+    print(min_rating, max_rating)
+    cursor.execute("SELECT id_movies FROM movies WHERE genres LIKE ? AND year BETWEEN ? AND ? AND rating BETWEEN ? AND ? AND countries LIKE ?",('%' + genre + '%', min_year, max_year, min_rating, max_rating, '%' + country + '%'))
+    matching_movie_ids = cursor.fetchall()
+    print(matching_movie_ids)
+    if not matching_movie_ids:
+         conn.close()
+         return None  # No movies found with the selected criteria
+    random_movie_id = random.choice(matching_movie_ids)[0]
+    print(random_movie_id)
     movie_info, poster_url = get_movie_info(random_movie_id)
     conn.close()
     return movie_info, poster_url

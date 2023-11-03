@@ -12,10 +12,12 @@ def create_categories_keyboard():
     search_btn_genre = KeyboardButton("🎲 5 случайных фильмов по жанрам")
     top_search_btn_country = KeyboardButton('🎲 5 случайных фильмов по стране')
     top_search_btn_ratings = KeyboardButton('🎲 5 случайных фильмов по рейтингу')
+    top_search_btn_full_setup = KeyboardButton('🎲 5 случайных фильмов полный выбор')
     categories_kb.add(random_btn, search_btn)
     categories_kb.add(search_btn_country, search_btn_ratings)
     categories_kb.add(random_btn_10, search_btn_genre)
     categories_kb.add(top_search_btn_country, top_search_btn_ratings)
+    categories_kb.add(top_search_btn_full_setup)
     return categories_kb
 
 
