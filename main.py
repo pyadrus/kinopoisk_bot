@@ -2,7 +2,8 @@ from aiogram import executor
 from loguru import logger
 
 from handlers.pagination_random.pagination_random_country import register_random_movie_country
-from handlers.pagination_random.pagination_random_full_setup import register_random_10_movie_command_handler_full_setup
+from handlers.pagination_random.pagination_random_full_setup import register_random_5_movie_command_handler_full_setup
+from handlers.random.random_full_setup import register_random_10_movie_command_handler_full_setup
 from handlers.pagination_random.pagination_random_genre import register_random_10_movie_command_handler_genres_1
 from handlers.pagination_random.pagination_random_rating import register_random_movie_rating
 from handlers.pagination_random.pagination_top_handlers import register_random_10_movie_command_handler
@@ -32,7 +33,8 @@ def main() -> None:
     register_random_rating_handler()  # Рандомный фильм по рейтингу
     register_random_movie_country()
     register_random_movie_rating()
-    register_random_10_movie_command_handler_full_setup()  # 5 рандомных фильмов полный выбор пользователя
+    register_random_10_movie_command_handler_full_setup()  # рандомный фильм полный выбор пользователя
+    register_random_5_movie_command_handler_full_setup()  # 5 рандомных фильмов полный выбор пользователя
 
 
 if __name__ == '__main__':
