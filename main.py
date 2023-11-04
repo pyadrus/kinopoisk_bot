@@ -1,6 +1,7 @@
 from aiogram import executor
 from loguru import logger
 
+from handlers.admin_handlers import register_admin_handler
 from handlers.pagination_random.pagination_menu_random import pagination_register_menu_random_handler
 from handlers.pagination_random.pagination_random_country import register_random_movie_country
 from handlers.pagination_random.pagination_random_full_setup import register_random_5_movie_command_handler_full_setup
@@ -39,6 +40,7 @@ def main() -> None:
     register_random_5_movie_command_handler_full_setup()  # 5 рандомных фильмов полный выбор пользователя
     register_menu_random_handler()
     pagination_register_menu_random_handler()
+    register_admin_handler()  # Проверка на подписку
 
 
 if __name__ == '__main__':

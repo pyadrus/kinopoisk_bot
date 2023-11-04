@@ -4,6 +4,23 @@ import random
 DATABASE_FILE = 'database.db'  # Имя файла базы данных
 
 
+def read_channels_from_database(DATABASE_FILE):
+    try:
+        conn = sqlite3.connect(DATABASE_FILE)
+        cursor = conn.cursor()
+        # Execute a SELECT query to fetch all channel usernames
+        cursor.execute("SELECT channel_username FROM channels")
+        rows = cursor.fetchall()
+        # Extract the channel usernames from the fetched rows
+        CHANNEL_USERNAMES = [row[0] for row in rows]
+        return CHANNEL_USERNAMES
+    except Exception as e:
+        print(f"Error reading data from the database: {e}")
+        return []
+    finally:
+        conn.close()
+
+
 def recording_movies_in_the_database(id_movies, name, year, rating, description, genres, countries, poster_url):
     """Запись фильмов в базу данных"""
     conn = sqlite3.connect(DATABASE_FILE)
@@ -134,18 +151,20 @@ def get_random_movie_by_genre_year_rating_country(keyword):
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
     print(keyword)
-    genre,year_range, country,  top_rating = keyword.split(',')
+    genre, year_range, country, top_rating = keyword.split(',')
     print(genre, country, year_range, top_rating)
     min_year, max_year = map(int, year_range.split('-'))
     print(min_year, max_year)
     min_rating, max_rating = map(float, top_rating.split('-'))
     print(min_rating, max_rating)
-    cursor.execute("SELECT id_movies FROM movies WHERE genres LIKE ? AND year BETWEEN ? AND ? AND rating BETWEEN ? AND ? AND countries LIKE ?",('%' + genre + '%', min_year, max_year, min_rating, max_rating, '%' + country + '%'))
+    cursor.execute(
+        "SELECT id_movies FROM movies WHERE genres LIKE ? AND year BETWEEN ? AND ? AND rating BETWEEN ? AND ? AND countries LIKE ?",
+        ('%' + genre + '%', min_year, max_year, min_rating, max_rating, '%' + country + '%'))
     matching_movie_ids = cursor.fetchall()
     print(matching_movie_ids)
     if not matching_movie_ids:
-         conn.close()
-         return None  # No movies found with the selected criteria
+        conn.close()
+        return None  # No movies found with the selected criteria
     random_movie_id = random.choice(matching_movie_ids)[0]
     print(random_movie_id)
     movie_info, poster_url = get_movie_info(random_movie_id)

@@ -67,12 +67,12 @@ class GenreSelectionState(StatesGroup):
     top_rating_selection = State()
 
 
-@dp.message_handler(lambda message: message.text == "🎬 Cлучайный фильм полный выбор")
+@dp.message_handler(lambda message: message.text == "🎬 Случайный фильм полный выбор")
 async def top_random_movie_command_full_setup(message: types.Message):
     """Случайный фильм полный выбор: выберите жанр, страну происхождения и год выпуска"""
     chat_id = message.chat.id
     main_page_kb = films_complete_selection_keyboard()
-    await bot.send_message(chat_id, "🎬 Cлучайный фильм полный выбор", reply_markup=main_page_kb)
+    await bot.send_message(chat_id, "🎬 Случайный фильм полный выбор", reply_markup=main_page_kb)
     genres_markup_user = create_genre_selection_keyboard_full_setup()
     await message.answer("Выберите жанр фильма:", reply_markup=genres_markup_user)
     await GenreSelectionState.genre_selection.set()
