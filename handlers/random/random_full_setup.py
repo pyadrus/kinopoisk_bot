@@ -5,6 +5,7 @@ from aiogram.utils.callback_data import CallbackData
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
 from database.database import get_random_movie_by_genre_year_rating_country
+from keyboards.reply.categories_btn import films_complete_selection_keyboard
 from system.dispatcher import dp, bot
 
 # Создаем CallbackData для выбора страны
@@ -68,8 +69,10 @@ class GenreSelectionState(StatesGroup):
 
 @dp.message_handler(lambda message: message.text == "🎬 Cлучайный фильм полный выбор")
 async def top_random_movie_command_full_setup(message: types.Message):
+    """Случайный фильм полный выбор: выберите жанр, страну происхождения и год выпуска"""
     chat_id = message.chat.id
-    await bot.send_message(chat_id, "🎲 5 случайных фильмов полный выбор")
+    main_page_kb = films_complete_selection_keyboard()
+    await bot.send_message(chat_id, "🎬 Cлучайный фильм полный выбор", reply_markup=main_page_kb)
     genres_markup_user = create_genre_selection_keyboard_full_setup()
     await message.answer("Выберите жанр фильма:", reply_markup=genres_markup_user)
     await GenreSelectionState.genre_selection.set()
@@ -133,6 +136,7 @@ async def full_user_selection_top_rating(query: CallbackQuery, state: FSMContext
 
 
 def register_random_10_movie_command_handler_full_setup():
+    """Случайный фильм полный выбор: выберите жанр, страну происхождения и год выпуска"""
     dp.register_message_handler(top_random_movie_command_full_setup)
     dp.register_callback_query_handler(full_user_selection_genre, genre_callback_full_setup.filter())
     dp.register_callback_query_handler(full_user_selection_country, full_user_selection_country_callback.filter())

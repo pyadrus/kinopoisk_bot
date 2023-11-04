@@ -7,6 +7,7 @@ from aiogram.types.input_media import InputMediaPhoto
 from aiogram.utils.callback_data import CallbackData
 import aiogram.utils.exceptions
 from database.database import get_random_movie_by_genre_year_rating_country
+from keyboards.reply.categories_btn import five_films_complete_selection_keyboard
 from system.dispatcher import dp, bot
 
 # Создаем CallbackData для выбора страны
@@ -73,7 +74,8 @@ class PaginationGenreSelectionState(StatesGroup):
 @dp.message_handler(lambda message: message.text == "🎲 5 случайных фильмов полный выбор")
 async def pagination_top_random_movie_command_full_setup(message: types.Message):
     chat_id = message.chat.id
-    await bot.send_message(chat_id, "🎲 5 случайных фильмов полный выбор")
+    main_page_kb = five_films_complete_selection_keyboard()
+    await bot.send_message(chat_id, "🎲 5 случайных фильмов полный выбор", reply_markup=main_page_kb)
     genres_markup_user = pagination_create_genre_selection_keyboard_full_setup()
     await message.answer("Выберите жанр фильма:", reply_markup=genres_markup_user)
     await PaginationGenreSelectionState.pagination_genre_selection.set()
