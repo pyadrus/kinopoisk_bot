@@ -1,6 +1,8 @@
 import sqlite3
 import random
 
+from loguru import logger
+
 DATABASE_FILE = 'database.db'  # Имя файла базы данных
 
 
@@ -25,24 +27,21 @@ def recording_movies_in_the_database(id_movies, name, year, rating, description,
     """Запись фильмов в базу данных"""
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
-
     # Проверяем, существует ли запись с таким id_movies
     cursor.execute("SELECT * FROM movies WHERE id_movies = ?", (id_movies,))
     existing_record = cursor.fetchone()
-
     if existing_record:
         # Запись с таким id_movies уже существует, вы можете решить, что делать с дубликатом
         # Например, вы можете обновить существующую запись или игнорировать дубликат
         # В этом примере, мы игнорируем дубликат
-        print(f"Запись с id_movies={id_movies} уже существует. Игнорируем дубликат.")
+        logger.info(f"Запись с id_movies={id_movies}, name={name}, countries={countries}, уже существует. Игнорируем дубликат.")
     else:
         # Запись с id_movies не существует, выполняем вставку
         cursor.execute("INSERT INTO movies (id_movies, name, year, rating, description, genres, countries, poster_url) "
                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                        (id_movies, name, year, rating, description, genres, countries, poster_url))
         conn.commit()
-        print(f"Запись с id_movies={id_movies} успешно добавлена в базу данных.")
-
+        logger.info(f"Запись с id_movies={id_movies}, name={name}, countries={countries}, успешно добавлена в базу данных.")
     conn.close()
 
 

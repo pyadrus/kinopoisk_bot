@@ -16,23 +16,6 @@ class SomeState(StatesGroup):
     RemovingChannel = State()
 
 
-# def read_channels_from_database_channel(DATABASE_FILE):
-#     try:
-#         conn = sqlite3.connect(DATABASE_FILE)
-#         cursor = conn.cursor()
-#         # Execute a SELECT query to fetch all channel usernames
-#         cursor.execute("SELECT channels FROM channel_username")
-#         rows = cursor.fetchall()
-#         # Extract the channel usernames from the fetched rows
-#         CHANNEL_USERNAMES = [row[0] for row in rows]
-#         return CHANNEL_USERNAMES
-#     except Exception as e:
-#         print(f"Error reading data from the database: {e}")
-#         return []
-#     finally:
-#         conn.close()
-
-
 @dp.message_handler(commands=['help'])
 async def cmd_help(message: types.Message):
     """Команда для проверки подписки"""

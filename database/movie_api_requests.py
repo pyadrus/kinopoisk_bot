@@ -29,13 +29,13 @@ def process_movie_data(movie):
     description = movie.get('description', 'Описание отсутствует')
     genres = ', '.join([genre.get('name', '') for genre in movie.get('genres', [])])
     countries = ', '.join([country.get('name', '') for country in movie.get('countries', [])])
-    print(movie.get('poster'))
+    # print(movie.get('poster'))
 
     if movie.get('poster') is not None:
         poster_url = movie['poster'].get('url')
     else:
         poster_url = ""
-        print(poster_url)
+        # print(poster_url)
 
     # movie_info = (f'Название: {name}\n'
     #               f'Год выпуска: {year}\n'

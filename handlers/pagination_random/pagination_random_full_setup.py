@@ -6,6 +6,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types.input_media import InputMediaPhoto
 from aiogram.utils.callback_data import CallbackData
 import aiogram.utils.exceptions
+from loguru import logger
+
 from database.database import get_random_movie_by_genre_year_rating_country
 from keyboards.reply.categories_btn import five_films_complete_selection_keyboard
 from system.dispatcher import dp, bot
@@ -81,7 +83,8 @@ async def pagination_top_random_movie_command_full_setup(message: types.Message)
     await PaginationGenreSelectionState.pagination_genre_selection.set()
 
 
-@dp.callback_query_handler(pagination_genre_callback_full_setup.filter(), state=PaginationGenreSelectionState.pagination_genre_selection)
+@dp.callback_query_handler(pagination_genre_callback_full_setup.filter(),
+                           state=PaginationGenreSelectionState.pagination_genre_selection)
 async def pagination_full_user_selection_genre(query: CallbackQuery, state: FSMContext, callback_data: dict):
     await state.update_data(genre=callback_data["genre"])
     country_markup = pagination_create_genre_random_movie_full_setup_keyboard()
@@ -89,7 +92,8 @@ async def pagination_full_user_selection_genre(query: CallbackQuery, state: FSMC
     await PaginationGenreSelectionState.pagination_country_selection.set()
 
 
-@dp.callback_query_handler(pagination_full_user_selection_country_callback.filter(), state=PaginationGenreSelectionState.pagination_country_selection)
+@dp.callback_query_handler(pagination_full_user_selection_country_callback.filter(),
+                           state=PaginationGenreSelectionState.pagination_country_selection)
 async def pagination_full_user_selection_country(query: CallbackQuery, state: FSMContext, callback_data: dict):
     await state.update_data(country=callback_data["country"])
     year_markup = pagination_create_year_selection_keyboard_full_setup()
@@ -97,7 +101,8 @@ async def pagination_full_user_selection_country(query: CallbackQuery, state: FS
     await PaginationGenreSelectionState.pagination_year_selection.set()
 
 
-@dp.callback_query_handler(pagination_year_callback_full_setup.filter(), state=PaginationGenreSelectionState.pagination_year_selection)
+@dp.callback_query_handler(pagination_year_callback_full_setup.filter(),
+                           state=PaginationGenreSelectionState.pagination_year_selection)
 async def pagination_full_user_selection_year(query: CallbackQuery, state: FSMContext, callback_data: dict):
     await state.update_data(year=callback_data["year"])
     top_rating_markup = pagination_top_create_rating_random_movie_by_rating_keyboard_full_setup()
@@ -105,7 +110,8 @@ async def pagination_full_user_selection_year(query: CallbackQuery, state: FSMCo
     await PaginationGenreSelectionState.pagination_top_rating_selection.set()
 
 
-@dp.callback_query_handler(pagination_top_rating_callback_full_setup.filter(), state=PaginationGenreSelectionState.pagination_top_rating_selection)
+@dp.callback_query_handler(pagination_top_rating_callback_full_setup.filter(),
+                           state=PaginationGenreSelectionState.pagination_top_rating_selection)
 async def pagination_full_user_selection_top_rating(query: CallbackQuery, state: FSMContext, callback_data: dict):
     data = await state.get_data()
     genre = data.get('genre', '')
@@ -131,7 +137,8 @@ async def pagination_full_user_selection_top_rating(query: CallbackQuery, state:
                 f"{genre},{year_range},{country},{top_rating}")
             items_random_full_setup[i] = [movie_info, poster_url]
         try:
-            await bot.send_photo(chat_id, photo=items_random_full_setup[0][1], caption=items_random_full_setup[0][0], reply_markup=pagination_random_full_setup(0))
+            await bot.send_photo(chat_id, photo=items_random_full_setup[0][1], caption=items_random_full_setup[0][0],
+                                 reply_markup=pagination_random_full_setup(0))
         except aiogram.utils.exceptions.BadRequest:
             await bot.send_message(chat_id, "Фильмы по выбранным параметрам не найдены.")
     except TypeError:
@@ -165,14 +172,21 @@ async def prev_page(query: types.CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(pag_cb_random_full_setup.filter(action="next"))
 async def next_page(query: types.CallbackQuery, callback_data: dict):
     page = int(callback_data["page"]) + 1
-    await query.message.edit_media(InputMediaPhoto(media=items_random_full_setup[page][1]))
-    await query.message.edit_caption(caption=items_random_full_setup[page][0],
-                                     reply_markup=pagination_random_full_setup(page))
+    try:
+        await query.message.edit_media(InputMediaPhoto(media=items_random_full_setup[page][1]))
+        await query.message.edit_caption(caption=items_random_full_setup[page][0],
+                                         reply_markup=pagination_random_full_setup(page))
+    except KeyError as error:
+        logger.exception(error)
 
 
 def register_random_5_movie_command_handler_full_setup():
     dp.register_message_handler(pagination_top_random_movie_command_full_setup)
-    dp.register_callback_query_handler(pagination_full_user_selection_genre, pagination_genre_callback_full_setup.filter())
-    dp.register_callback_query_handler(pagination_full_user_selection_country, pagination_full_user_selection_country_callback.filter())
-    dp.register_callback_query_handler(pagination_full_user_selection_year, pagination_year_callback_full_setup.filter())
-    dp.register_callback_query_handler(pagination_full_user_selection_top_rating, pagination_top_rating_callback_full_setup.filter())
+    dp.register_callback_query_handler(pagination_full_user_selection_genre,
+                                       pagination_genre_callback_full_setup.filter())
+    dp.register_callback_query_handler(pagination_full_user_selection_country,
+                                       pagination_full_user_selection_country_callback.filter())
+    dp.register_callback_query_handler(pagination_full_user_selection_year,
+                                       pagination_year_callback_full_setup.filter())
+    dp.register_callback_query_handler(pagination_full_user_selection_top_rating,
+                                       pagination_top_rating_callback_full_setup.filter())

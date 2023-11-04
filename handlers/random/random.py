@@ -14,9 +14,9 @@ async def get_random_movie(chat_id, api_key):
     response = requests.get(url, headers=headers, timeout=(10, 30))
     if response.status_code == 200:
         data = response.json()
-        print(data)
+        # print(data)
         id_movies = data.get('id')
-        print(id_movies)
+        # print(id_movies)
         name = data.get('name', 'Название фильма не найдено')
         year = data.get('year', 'Год выпуска не найден')
         rating = data.get('rating', {}).get('kp', 'Рейтинг не найден')
