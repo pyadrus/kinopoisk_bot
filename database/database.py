@@ -1,7 +1,7 @@
 import sqlite3
 import random
 
-DATABASE_FILE = 'channels.db'  # Имя файла базы данных
+DATABASE_FILE = 'database.db'  # Имя файла базы данных
 
 
 def recording_movies_in_the_database(id_movies, name, year, rating, description, genres, countries, poster_url):
