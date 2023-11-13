@@ -26,7 +26,10 @@ async def greeting(message: types.Message, state: FSMContext):
             await bot.send_photo(message.from_user.id, caption=post_greeting, photo=photo_file,
                                  reply_markup=categories_kb)
     else:
-        await message.reply("Для использования ботом, вы должны быть участником следующих групп/каналов:\n\n" + "\n".join(channel_usernames))
+        await bot.send_message(message.from_user.id, f"<blockquote>‼️Для того чтобы пользоваться ботом 🔗@CineSearch24_bot, вы должны быть участником следующих групп/каналов:\n\n"
+                            f"{' '.join(channel_usernames)}\n\n"
+                            f"Если вы уже подписаны или подписались, нажмите: ➡️ /start.</blockquote>\n\n"
+                            f"Если по какой-то причине бот все равно не отвечает, напишите разработчику @PyAdminRU")
 
 
 @dp.message_handler(lambda message: message.text == "⬅️ На главную")
